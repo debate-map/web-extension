@@ -1,0 +1,27 @@
+{
+	"manifest_version": 3,
+	"name": "Debate Map - Web Extension",
+	"version": "1.0.0",
+	"description": "Chrome web-extension for use with Debate Map.",
+	"icons": {"128": "Logo_128.png"},
+	"background":{
+		"service_worker": "Dist/main.bundle.js",
+		"@type": "module"
+	},
+	"permissions": [
+		"activeTab",
+		"tabs"
+	],
+	"host_permissions": ["*://*/*"],
+	"content_scripts":[{
+		"all_frames": true,
+		"js": ["Dist/main.bundle.js"],
+		"matches": ["*://*/*"],
+		"run_at": "document_start"
+	}],
+	"action": {
+		"@default_icon": "icon.png",
+		"default_popup": "popup.html",
+		"@default_title": "Chrome VTools - Personal"
+	}
+}
