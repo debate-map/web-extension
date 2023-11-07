@@ -22,18 +22,31 @@ chrome.runtime.onInstalled.addListener(()=>{
 		id: "parent"
 	});
 	chrome.contextMenus.create({
+		title: "Take screenshot (now)",
+		parentId: parent,
+		id: "takeScreenshot_now",
+	});
+	chrome.contextMenus.create({
 		title: "Take screenshot (1s)",
 		parentId: parent,
 		id: "takeScreenshot_1s",
-		//onclick: ()=>{}, // not supported in background script
+	});
+	chrome.contextMenus.create({
+		title: "Take screenshot (3s)",
+		parentId: parent,
+		id: "takeScreenshot_3s",
+	});
+	chrome.contextMenus.create({
+		title: "Take screenshot (5s)",
+		parentId: parent,
+		id: "takeScreenshot_5s",
 	});
 });
 chrome.contextMenus.onClicked.addListener((info, tab)=>{
-	if (info.menuItemId == "takeScreenshot_1s") {
-		setTimeout(()=>{
-			TakeAndSaveScreenshot();
-		}, 1000);
-	}
+	if (info.menuItemId == "takeScreenshot_now") TakeAndSaveScreenshot();
+	else if (info.menuItemId == "takeScreenshot_1s") setTimeout(()=>TakeAndSaveScreenshot(), 1000);
+	else if (info.menuItemId == "takeScreenshot_3s") setTimeout(()=>TakeAndSaveScreenshot(), 3000);
+	else if (info.menuItemId == "takeScreenshot_5s") setTimeout(()=>TakeAndSaveScreenshot(), 5000);
 });
 
 // regular runtime
