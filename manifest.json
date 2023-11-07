@@ -10,7 +10,9 @@
 	},
 	"permissions": [
 		"activeTab",
-		"tabs"
+		"tabs",
+		"contextMenus",
+		"downloads"
 	],
 	"host_permissions": ["*://*/*"],
 	"content_scripts":[{

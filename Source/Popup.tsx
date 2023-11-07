@@ -2,6 +2,7 @@ import {StartDownload} from "js-vextensions";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {Column, Row} from "react-vcomponents";
+import {TakeAndSaveScreenshot} from "./Utils/Screenshots";
 
 var g = globalThis as any;
 declare var chrome: any;
@@ -20,7 +21,6 @@ export function Start_Popup() {
 	ReactDOM.render(<Popup/>, document.getElementById("reactRoot_popup"), undefined);
 }
 
-
 class Popup extends React.Component<{}, {}> {
 	render() {
 		return (
@@ -35,11 +35,7 @@ class Popup extends React.Component<{}, {}> {
 						Do Something
 					</button>
 					<button onClick={()=>{
-						chrome.tabs.captureVisibleTab(null, {}, dataUri=>{
-							console.log(dataUri);
-							const dateStr_short = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-							StartDownload(dataUri, `Screenshot_${dateStr_short}.png`, "", false);
-						});
+						TakeAndSaveScreenshot();
 					}}>Test screenshot</button>
 				</Row>
 			</Column>
