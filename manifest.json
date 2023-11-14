@@ -5,14 +5,17 @@
 	"description": "Chrome web-extension for use with Debate Map.",
 	"icons": {"128": "Logo_128.png"},
 	"background":{
-		"service_worker": "Dist/main.bundle.js",
-		"@type": "module"
+		"scripts": ["Dist/main.bundle.js"],
+		"type": "module"
 	},
 	"permissions": [
 		"activeTab",
 		"tabs",
 		"contextMenus",
 		"downloads"
+	],
+	"optional_permissions": [
+		"<all_urls>"
 	],
 	"host_permissions": ["*://*/*"],
 	"content_scripts":[{
