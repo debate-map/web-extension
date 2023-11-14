@@ -56,16 +56,39 @@ declare var chrome;
 export function Start_Background() {
 }
 
-// bridge with this extension's popup
+// bridge with this extension's content/on-page-load script
 // ==========
 
-globalThis.chrome.runtime.onMessage.addListener(OnReceiveMessageFromPopup);
-function OnReceiveMessageFromPopup(message) {
-	console.log("Received from popup:" + message);
-	if (message.type == "DoSomething1") {
-		console.log(`DoingSomething1... ${message.myField1}`);
+/*chrome.runtime.onConnect.addListener(function(port) {
+	if (port.name === "port-from-debate-map-content-scripts") {
+		port.onMessage.addListener(message=>{
+			if (message.type == "DebateMap_CaptureFrame") {
+				// todo
+			}
+		});
 	}
-}
-function SendMessageToPopup(message) {
-	globalThis.chrome.runtime.sendMessage(message, response=> {});
-}
+});*/
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
+	//console.log("Received message:", message);
+
+	if (message.type == "DebateMap_CaptureFrame") {
+		const {mapID, renderStartTime, currentFrameTime, currentFrameNumber} = message;
+		chrome.tabs.captureVisibleTab(null, {format: "png"}, dataUri=>{
+			console.log(dataUri);
+			const dateStr_short = new Date(renderStartTime).toLocaleString("sv").replace(/[^0-9]/g, "-");
+			chrome.downloads.download({
+				url: dataUri,
+				filename: `DebateMap/Renders/${dateStr_short}/${currentFrameNumber}.png`,
+			}, downloadId=>{
+				const message = {type: "DebateMap_CaptureFrame_done", mapID, renderStartTime, currentFrameTime, currentFrameNumber};
+				console.log("Sending response:", message);
+				sendResponse(message);
+			});
+		});
+		return true;
+	}
+});
+/*function SendMessageToPopup(message) {
+	chrome.runtime.sendMessage(message, response=> {});
+}*/
