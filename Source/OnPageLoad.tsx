@@ -22,15 +22,6 @@ export function Start_OnPageLoad() {
 declare var browser;
 //declare var chrome;
 
-/*const portToBackground = browser.runtime.connect({name: "port-from-debate-map-content-scripts"});
-globalThis.portToBackground = portToBackground;
-portToBackground.onMessage.addListener(message=>{
-	if (message.type == "DebateMap_CaptureFrame_done") {
-		// just pass back its response as-is
-		window.postMessage(message, "*");
-	}
-});*/
-
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	if (message.type == "DebateMap_CaptureFrame_done") {
 		// just pass back the response as-is to page
@@ -48,27 +39,6 @@ export function OnPageLoad() {
 		if (event.data?.type == "DebateMap_CaptureFrame") {
 			// just pass this message on to the background script (rather than read response directly here, we'll process the response within a general-purpose message-listener seen above, for higher resilience)
 			browser.runtime.sendMessage(event.data);
-
-			// just pass this message on to the background script
-			/*const responseMessage = await chrome.runtime.sendMessage(event.data);
-			console.log("Content-script got response from background:", responseMessage);
-			// and pass back its response as-is
-			window.postMessage(responseMessage, "*");*/
-
-			// just pass this message on to the background script
-			//portToBackground.postMessage(event.data);
-			/*console.log("PortToBackground:", globalThis.portToBackground, "@message:", event.data);
-			globalThis.portToBackground.postMessage(event.data);*/
 		}
   });
 }
-
-/*chrome.runtime.onConnect.addListener(function(port) {
-	console.assert(port.name === "port-to-debate-map-content-script");
-	port.onMessage.addListener(message=>{
-		if (message.type == "DebateMap_CaptureFrame_done") {
-			// just pass back its response as-is
-			window.postMessage(message, "*");
-		}
-	});
- });*/
