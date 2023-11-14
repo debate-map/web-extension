@@ -70,7 +70,7 @@ export function Start_Background() {
 // bridge with this extension's content/on-page-load script
 // ==========
 
-const portsFromContentScripts = [] as any[];
+/*const portsFromContentScripts = [] as any[];
 browser.runtime.onConnect.addListener(function(port) {
 	if (port.name === "port-from-debate-map-content-scripts") {
 		portsFromContentScripts.push(port); // required to keep port alive
@@ -94,25 +94,31 @@ browser.runtime.onConnect.addListener(function(port) {
 			}
 		});
 	}
-});
+});*/
 
-/*chrome.runtime.onMessage.addListener((message, sender, sendResponse)=>{
+browser.runtime.onMessage.addListener((message, sender, sendResponse)=>{
 	//console.log("Received message:", message);
 
 	if (message.type == "DebateMap_CaptureFrame") {
 		const {mapID, renderStartTime, currentFrameTime, currentFrameNumber} = message;
-		chrome.tabs.captureVisibleTab(null, {format: "png"}, dataUri=>{
+		browser.tabs.captureVisibleTab(null, {format: "png"}, dataUri=>{
 			console.log(dataUri);
 			const dateStr_short = new Date(renderStartTime).toLocaleString("sv").replace(/[^0-9]/g, "-");
-			chrome.downloads.download({
-				url: dataUri,
+			
+			// to stitch these frames into a video, run an ffmpeg command like this (can remove the `-vf [...]` part if height is multiple of 2)
+			// ffmpeg -r 60 -i %d.png -c:v libx264 -r 60 -pix_fmt yuv420p -qp 0 -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" output.mp4
+			
+			browser.downloads.download({
+				//url: dataUri,
+				url: URL.createObjectURL(DataURItoBlob(dataUri)), // firefox requires that we use a blob
 				filename: `DebateMap/Renders/${dateStr_short}/${currentFrameNumber}.png`,
 			}, downloadId=>{
 				const message = {type: "DebateMap_CaptureFrame_done", mapID, renderStartTime, currentFrameTime, currentFrameNumber};
 				console.log("Sending response:", message);
-				sendResponse(message);
+				//sendResponse(message);
+				//port.postMessage(message);
+				browser.tabs.sendMessage(sender.tab.id, message);
 			});
 		});
-		return true;
 	}
-});*/
+});

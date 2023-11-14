@@ -22,12 +22,21 @@ export function Start_OnPageLoad() {
 declare var browser;
 //declare var chrome;
 
-const portToBackground = browser.runtime.connect({name: "port-from-debate-map-content-scripts"});
+/*const portToBackground = browser.runtime.connect({name: "port-from-debate-map-content-scripts"});
 globalThis.portToBackground = portToBackground;
 portToBackground.onMessage.addListener(message=>{
 	if (message.type == "DebateMap_CaptureFrame_done") {
 		// just pass back its response as-is
 		window.postMessage(message, "*");
+	}
+});*/
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+	if (message.type == "DebateMap_CaptureFrame_done") {
+		// just pass back the response as-is to page
+		window.postMessage(message, "*");
+
+		return true; // is this necessary?
 	}
 });
 
@@ -37,8 +46,8 @@ export function OnPageLoad() {
 		if (event.source != window) return;
   
 		if (event.data?.type == "DebateMap_CaptureFrame") {
-			// just pass this message on to the background script (not reading response here, since chrome too impatient for download/response-sending; instead we listen through onConnect+onMessage listener below) [edit: nvm, false]
-			//chrome.runtime.sendMessage(event.data);
+			// just pass this message on to the background script (rather than read response directly here, we'll process the response within a general-purpose message-listener seen above, for higher resilience)
+			browser.runtime.sendMessage(event.data);
 
 			// just pass this message on to the background script
 			/*const responseMessage = await chrome.runtime.sendMessage(event.data);
@@ -48,8 +57,8 @@ export function OnPageLoad() {
 
 			// just pass this message on to the background script
 			//portToBackground.postMessage(event.data);
-			console.log("PortToBackground:", globalThis.portToBackground, "@message:", event.data);
-			globalThis.portToBackground.postMessage(event.data);
+			/*console.log("PortToBackground:", globalThis.portToBackground, "@message:", event.data);
+			globalThis.portToBackground.postMessage(event.data);*/
 		}
   });
 }
